@@ -69,11 +69,13 @@ void compare_hashes(const std::vector<unsigned char> expected,
                     const std::string &output_filename) {
   std::ifstream hash_output{output_filename};
   std::vector<unsigned char> actual = SHA{}.hash(hash_output);
+  std::cout << "Actual SHA:\n";
+  print_hex(actual);
 
   if (actual == expected) {
-    std::cout << "SHA-512 hashes match." << std::endl;
+    std::cout << "\nSHA-512 hashes match." << std::endl;
   } else {
-    std::cout << "SHA-512 hashes DO NOT match." << std::endl;
+    std::cout << "\nSHA-512 hashes DO NOT match." << std::endl;
   }
 }
 
@@ -82,12 +84,14 @@ void decrypt(const std::string &input_filename,
   std::vector<unsigned char> expected_hash(HASH_BYTES), key(KEY_BYTES),
       iv(KEY_BYTES);
 
-  std::ifstream input{input_filename};
-  std::ofstream output{output_filename};
+  {
+    std::ifstream input{input_filename};
+    std::ofstream output{output_filename};
 
-  read_keys(input, expected_hash, key, iv);
-  print_keys(expected_hash, key, iv);
-  AES{}.decrypt(input, output, key, iv);
+    read_keys(input, expected_hash, key, iv);
+    print_keys(expected_hash, key, iv);
+    AES{}.decrypt(input, output, key, iv);
+  }
 
   compare_hashes(expected_hash, output_filename);
 }
