@@ -1,20 +1,27 @@
 #ifndef PB173_AES_H_
 #define PB173_AES_H_
 #include <mbedtls/cipher.h>
-#include <string>
-#include "constants.h"
+#include <iostream>
+#include <vector>
 
 class AES {
  private:
   mbedtls_cipher_context_t context_;
+  void init(const std::vector<unsigned char> &aes_key,
+            const std::vector<unsigned char> &iv,
+            mbedtls_operation_t operation);
+  void process(std::istream &input, std::ostream &output);
 
  public:
   AES();
 
-  void encrypt(const std::string &input_filename,
-               const std::string &output_filename,
-               const unsigned char aes_key[KEYBYTES],
-               const unsigned char iv[KEYBYTES]);
+  void encrypt(std::istream &input_filename, std::ostream &output_filename,
+               const std::vector<unsigned char> &aes_key,
+               const std::vector<unsigned char> &iv);
+
+  void decrypt(std::istream &input_filename, std::ostream &output_filename,
+               const std::vector<unsigned char> &aes_key,
+               const std::vector<unsigned char> &iv);
 
   ~AES() { mbedtls_cipher_free(&context_); }
 };

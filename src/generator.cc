@@ -1,5 +1,6 @@
 #include "generator.h"
 #include <stdexcept>
+#include "constants.h"
 
 Generator::Generator() {
   mbedtls_entropy_init(&entropy_);
@@ -10,13 +11,16 @@ Generator::Generator() {
   }
 }
 
-void Generator::generate_random_bytes(unsigned char key[KEYBYTES]) {
-  switch (mbedtls_ctr_drbg_random(&ctr_drbg_, key, KEYBYTES)) {
+std::vector<unsigned char> Generator::generate_random_bytes() {
+  std::vector<unsigned char> key(KEY_BYTES);
+  switch (mbedtls_ctr_drbg_random(&ctr_drbg_, key.data(), KEY_BYTES)) {
     case MBEDTLS_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED:
       throw std::runtime_error("MBEDTLS_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED");
     case MBEDTLS_ERR_CTR_DRBG_REQUEST_TOO_BIG:
       throw std::runtime_error("MBEDTLS_ERR_CTR_DRBG_REQUEST_TOO_BIG");
     case 0:
-      return;
+      return key;
+    default:
+      throw std::runtime_error("unexpected error in generate_random_bytes");
   }
 }

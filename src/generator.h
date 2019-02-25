@@ -2,7 +2,7 @@
 #define PB173_GENERATOR_H_
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/entropy.h>
-#include "constants.h"
+#include <vector>
 
 class Generator {
  private:
@@ -10,16 +10,16 @@ class Generator {
   mbedtls_entropy_context entropy_{};
   const unsigned char entropy_source_[10] = {134, 70,  71,  166, 233,
                                              204, 210, 225, 221, 233};
-  void generate_random_bytes(unsigned char key[KEYBYTES]);
+  std::vector<unsigned char> generate_random_bytes();
 
  public:
   Generator();
 
-  void generate_aes_key(unsigned char key[KEYBYTES]) {
-    generate_random_bytes(key);
+  std::vector<unsigned char> generate_aes_key() {
+    return generate_random_bytes();
   }
 
-  void generate_iv(unsigned char iv[KEYBYTES]) { generate_random_bytes(iv); }
+  std::vector<unsigned char> generate_iv() { return generate_random_bytes(); }
 
   ~Generator() {
     mbedtls_ctr_drbg_free(&ctr_drbg_);

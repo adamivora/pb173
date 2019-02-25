@@ -1,6 +1,7 @@
 #include "aes.h"
 #include <mbedtls/cipher.h>
 #include <fstream>
+#include "constants.h"
 
 AES::AES() {
   mbedtls_cipher_init(&context_);
@@ -13,39 +14,45 @@ AES::AES() {
   }
 }
 
-void AES::encrypt(const std::string &input_filename,
-                  const std::string &output_filename,
-                  const unsigned char aes_key[KEYBYTES],
-                  const unsigned char iv[KEYBYTES]) {
-  if (mbedtls_cipher_setkey(&context_, aes_key, KEYBITS, MBEDTLS_ENCRYPT) < 0) {
+void AES::init(const std::vector<unsigned char> &aes_key,
+               const std::vector<unsigned char> &iv,
+               mbedtls_operation_t operation) {
+  if (mbedtls_cipher_setkey(&context_, aes_key.data(), KEY_BITS, operation) <
+      0) {
     throw std::runtime_error("mbedtls_cipher_setkey failed");
   }
 
-  if (mbedtls_cipher_set_iv(&context_, iv, KEYBYTES) < 0) {
+  if (mbedtls_cipher_set_iv(&context_, iv.data(), KEY_BYTES) < 0) {
     throw std::runtime_error("MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA");
   }
+}
 
-  std::ifstream input{input_filename};
-  if (!input) {
-    throw std::runtime_error("cannot read input file");
-  }
+void AES::encrypt(std::istream &input, std::ostream &output,
+                  const std::vector<unsigned char> &aes_key,
+                  const std::vector<unsigned char> &iv) {
+  init(aes_key, iv, MBEDTLS_ENCRYPT);
+  process(input, output);
+}
 
-  std::ofstream output{output_filename};
-  if (!output.write(reinterpret_cast<const char *>(iv), KEYBYTES)) {
-    throw std::runtime_error("cannot access output file");
-  }
+void AES::decrypt(std::istream &input, std::ostream &output,
+                  const std::vector<unsigned char> &aes_key,
+                  const std::vector<unsigned char> &iv) {
+  init(aes_key, iv, MBEDTLS_DECRYPT);
+  process(input, output);
+}
 
-  unsigned char buffer[KEYBYTES];
-  char *b = reinterpret_cast<char *>(buffer);
+void AES::process(std::istream &input, std::ostream &output) {
+  std::vector<unsigned char> buffer(KEY_BYTES);
+  char *b = reinterpret_cast<char *>(buffer.data());
 
-  unsigned char output_buffer[KEYBYTES];
-  char *o = reinterpret_cast<char *>(output_buffer);
+  std::vector<unsigned char> output_buffer(KEY_BYTES);
+  char *o = reinterpret_cast<char *>(output_buffer.data());
 
   int read_bytes;
   size_t olen;
-  while ((read_bytes = input.read(b, KEYBYTES).gcount()) != 0) {
-    if (mbedtls_cipher_update(&context_, buffer, read_bytes, output_buffer,
-                              &olen) < 0) {
+  while ((read_bytes = input.read(b, KEY_BYTES).gcount()) != 0) {
+    if (mbedtls_cipher_update(&context_, buffer.data(), read_bytes,
+                              output_buffer.data(), &olen) < 0) {
       throw std::runtime_error("mbedtls_cipher_update failed");
     }
     output.write(o, olen);
@@ -55,7 +62,7 @@ void AES::encrypt(const std::string &input_filename,
     throw std::runtime_error("input stream error while reading");
   }
 
-  if (mbedtls_cipher_finish(&context_, output_buffer, &olen) < 0) {
+  if (mbedtls_cipher_finish(&context_, output_buffer.data(), &olen) < 0) {
     throw std::runtime_error("mbedtls_cipher_finish failed");
   }
   output.write(o, olen);
