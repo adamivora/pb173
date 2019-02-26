@@ -73,9 +73,9 @@ void compare_hashes(const std::vector<unsigned char> expected,
   print_hex(actual);
 
   if (actual == expected) {
-    std::cout << "\nSHA-512 hashes match." << std::endl;
+    std::cout << "\n\nSHA-512 hashes match." << std::endl;
   } else {
-    std::cout << "\nSHA-512 hashes DO NOT match." << std::endl;
+    std::cout << "\n\nSHA-512 hashes DO NOT match." << std::endl;
   }
 }
 
