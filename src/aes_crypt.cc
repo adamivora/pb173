@@ -1,5 +1,6 @@
 #include "aes_crypt.h"
 #include <fstream>
+#include <stdexcept>
 #include "constants.h"
 #include "mbedtls/cipher.h"
 

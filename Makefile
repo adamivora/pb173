@@ -2,7 +2,7 @@
 # Variables CC and CXX are automatically set on all UNIX systems.
 
 # Variable settings
-CXXFLAGS=-std=c++17 -Wall -Wextra -Weffc++ -pedantic -I./src
+CXXFLAGS=-std=c++11 -Wall -Wextra -Weffc++ -pedantic -I./src
 CFLAGS=-std=c99 -Wall -Wextra -pedantic -I./src
 SOURCES_ALL=$(wildcard src/*.c) $(wildcard src/*.cc)
 SOURCES_GEN=$(filter-out src/main.cc src/testing.cc, $(SOURCES_ALL))

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <stdexcept>
 #include <vector>
 #include "aes_crypt.h"
 #include "constants.h"
