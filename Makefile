@@ -5,7 +5,7 @@
 CXXFLAGS=-std=c++11 -Wall -Wextra -Weffc++ -pedantic -I./src
 CFLAGS=-std=c99 -Wall -Wextra -pedantic -I./src
 SOURCES_ALL=$(wildcard src/*.c) $(wildcard src/*.cc)
-SOURCES_GEN=$(filter-out src/main.cc src/testing.cc src/test-main.cc, $(SOURCES_ALL))
+SOURCES_GEN=$(filter-out src/main.cc $(wildcard src/test-*.cc), $(SOURCES_ALL))
 
 # Source and object lists for main program
 SOURCES_MAIN=$(SOURCES_GEN) src/main.cc
@@ -13,7 +13,7 @@ OBJECTS_C_MAIN=$(SOURCES_MAIN:.c=.o)
 OBJECTS_MAIN=$(OBJECTS_C_MAIN:.cc=.o)
 
 # Source and object lists for testing binary
-SOURCES_TEST=$(SOURCES_GEN) src/testing.cc src/test-main.cc
+SOURCES_TEST=$(SOURCES_GEN) $(wildcard src/test-*.cc)
 OBJECTS_C_TEST=$(SOURCES_TEST:.c=.o)
 OBJECTS_TEST=$(OBJECTS_C_TEST:.cc=.o)
 
