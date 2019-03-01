@@ -2,14 +2,20 @@
 # Variables CC and CXX are automatically set on all UNIX systems.
 
 # Variable settings
-CXXFLAGS=-Wall -Wextra -Weffc++ -pedantic -lmbedcrypto -I./library
-SOURCES_GEN=src/aes.cc src/generator.cc src/sha.cc
+CXXFLAGS=-std=c++17 -Wall -Wextra -Weffc++ -pedantic -I./src
+CFLAGS=-std=c99 -Wall -Wextra -pedantic -I./src
+SOURCES_ALL=$(wildcard src/*.c) $(wildcard src/*.cc)
+SOURCES_GEN=$(filter-out src/main.cc src/testing.cc, $(SOURCES_ALL))
+
 # Source and object lists for main program
-SOURCES_MAIN=$(SOURCES_GEN) src/cipher.cc
-OBJECTS_MAIN=$(SOURCES_MAIN:.cpp=.o)
+SOURCES_MAIN=$(SOURCES_GEN) src/main.cc
+OBJECTS_C_MAIN=$(SOURCES_MAIN:.c=.o)
+OBJECTS_MAIN=$(OBJECTS_C_MAIN:.cc=.o)
+
 # Source and object lists for testing binary
 SOURCES_TEST=$(SOURCES_GEN) src/testing.cc
-OBJECTS_TEST=$(SOURCES_TEST:.cpp=.o)
+OBJECTS_C_TEST=$(SOURCES_TEST:.c=.o)
+OBJECTS_TEST=$(OBJECTS_C_MAIN:.cc=.o)
 
 # Most frequently used automatic variables:
 # $@ (name of the target rule)
@@ -23,23 +29,26 @@ OBJECTS_TEST=$(SOURCES_TEST:.cpp=.o)
 
 # Target 'all' has 'main' and 'main-test' as dependencies.
 # It is the first defined target (so it's run if no target is specified from CLI).
-all: cipher cipher-test
+all: main main-test
 
 # Depends on main-test, runs the test program.
-test: cipher-test
-	./cipher-test
+test: main-test
+	./main-test
 
 # Depends on all object files and main, links the final binary.
-cipher: $(OBJECTS_MAIN)
+main: $(OBJECTS_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 # Depends on all object files and test, links the test binary.
-cipher-test: $(OBJECTS_TEST)
+main-test: $(OBJECTS_TEST)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 # Automatic rule for all object files in build directory
-%.o: %.cpp
+%.o: %.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -rf $(OBJECTS_MAIN) $(OBJECTS_TEST)

@@ -1,4 +1,4 @@
-#include "aes.h"
+#include "aes_crypt.h"
 
 // Tell CATCH to define its main function here
 #define CATCH_CONFIG_MAIN

@@ -3,10 +3,10 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
-#include "aes.h"
+#include "aes_crypt.h"
 #include "constants.h"
 #include "generator.h"
-#include "sha.h"
+#include "sha_crypt.h"
 
 void print_hex(const std::vector<unsigned char> &bytes) {
   for (const auto &byte : bytes) {

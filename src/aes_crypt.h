@@ -1,5 +1,5 @@
-#ifndef PB173_AES_H_
-#define PB173_AES_H_
+#ifndef PB173_AES_CRYPT_H_
+#define PB173_AES_CRYPT_H_
 #include <iostream>
 #include <vector>
 #include "mbedtls/cipher.h"
@@ -26,4 +26,4 @@ class AES {
   ~AES() { mbedtls_cipher_free(&context_); }
 };
 
-#endif  // PB173_AES_H_
+#endif  // PB173_AES_CRYPT_H_
