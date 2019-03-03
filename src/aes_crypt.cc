@@ -19,6 +19,14 @@ void AES::init(const std::vector<unsigned char> &aes_key,
                const std::vector<unsigned char> &iv,
                mbedtls_operation_t operation,
                mbedtls_cipher_padding_t padding_mode) {
+  if (aes_key.size() != KEY_BYTES) {
+    throw std::runtime_error("aes_key has invalid length");
+  }
+
+  if (iv.size() != KEY_BYTES) {
+    throw std::runtime_error("iv has invalid length");
+  }
+
   if (mbedtls_cipher_setkey(&context_, aes_key.data(), KEY_BITS, operation) <
       0) {
     throw std::runtime_error("mbedtls_cipher_setkey failed");
@@ -52,6 +60,14 @@ void AES::decrypt(
 }
 
 void AES::process(std::istream &input, std::ostream &output) {
+  if (!input) {
+    throw std::runtime_error("input stream invalid");
+  }
+
+  if (!output) {
+    throw std::runtime_error("output stream invalid");
+  }
+
   std::vector<unsigned char> buffer(KEY_BYTES);
   char *b = reinterpret_cast<char *>(buffer.data());
 
